@@ -4,6 +4,8 @@ import requests
 def get_offers(api_url: str, auth_key: str, department_code: str, paginate_max: int):
     headers = {"Authorization": f"Basic {auth_key}", "Connection": "close"}
 
+    offers = list()
+
     for i in range(1, paginate_max + 1):
         print(f"Get job offers from the results page #{i}")
         body = {
@@ -12,5 +14,6 @@ def get_offers(api_url: str, auth_key: str, department_code: str, paginate_max: 
         }
         resp = requests.post(api_url, data=body, headers=headers)
 
-        offers = resp.json()
-        return offers
+        offers = offers + list(resp.json())
+
+    return offers
