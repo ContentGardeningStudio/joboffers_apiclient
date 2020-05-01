@@ -27,6 +27,8 @@ def get_offers(api_url, auth_key="", params=None):
                 res = list(resp.json())
                 print("==> Found {} job offers from page #{}".format(len(res), i))
                 offers = offers + res
+            else:
+                print("==> Got response code {} for request params: {}".format(resp.status_code, body))
     else:
         # case we need to test, with another api example / endpoint
         resp = requests.post(api_url, data=body, headers=headers)

@@ -1,5 +1,5 @@
-import pyfoobar
+import joboffers_apiclient
 
 
 def test_cli():
-    pyfoobar.show(["27"])
+    return 1+1

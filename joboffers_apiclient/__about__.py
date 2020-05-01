@@ -5,6 +5,6 @@ except ImportError:
     import importlib_metadata as metadata
 
 try:
-    __version__ = metadata.version("joboffers_api_client")
+    __version__ = metadata.version("joboffers_apiclient")
 except Exception:
     __version__ = "unknown"
