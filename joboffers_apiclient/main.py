@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 import requests
 
 SUPPORTED_APIS = {
@@ -9,10 +11,6 @@ SUPPORTED_APIS = {
 }
 
 
-# Design notes:
-# - Impose using location + pagination.
-
-
 def get_offers(api_name, auth_key="", params=None):
     """ Get offers by submitting a POST request to an API we use """
 
@@ -20,13 +18,15 @@ def get_offers(api_name, auth_key="", params=None):
         print("'{}' is not a supported API".format(api_name))
         return []
 
-    # The params (used as query string for GET or as 'body' parameter for POST)
     params = params or {}
     paginate_max = params.get("paginate_max", 1)
 
     if "location" not in params:
         print("Calls without specifying a 'location' are not allowed")
         return []
+
+    # prepare the request parameters
+    req_params = {"location": params["location"]}
 
     api_url = SUPPORTED_APIS[api_name]["url"]
     api_method = SUPPORTED_APIS[api_name]["method"].lower()
@@ -42,11 +42,12 @@ def get_offers(api_name, auth_key="", params=None):
     offers = []
 
     if api_name == "githubjobs":
-        # todo: IMPORTANT / add 'location' to the request parameters.
         # todo: check if pagination here starts at 0 or 1.
         for i in range(1, paginate_max + 1):
             print("Getting job positions from the page #{}...".format(i))
-            resp = func(api_url + "?page=" + str(i), headers=headers)
+            req_params["page"] = str(i)
+            qs = urlencode(req_params)
+            resp = func("{}?{}".format(api_url, qs), headers=headers)
 
             if resp.status_code == 200:
                 res = list(resp.json())
@@ -59,12 +60,10 @@ def get_offers(api_name, auth_key="", params=None):
                     )
                 )
     elif api_name == "apec":
-        body = {"department_code": params["location"]}
-
         for i in range(1, paginate_max + 1):
             print("Getting job offers from the results page #{}...".format(i))
-            body["page"] = i
-            resp = func(api_url, data=body, headers=headers)
+            req_params["page"] = i
+            resp = func(api_url, data=req_params, headers=headers)
 
             if resp.status_code == 200:
                 res = list(resp.json())
@@ -73,7 +72,7 @@ def get_offers(api_name, auth_key="", params=None):
             else:
                 print(
                     "==> Response code {} for the POST request with data {}".format(
-                        resp.status_code, body
+                        resp.status_code, req_params
                     )
                 )
 
