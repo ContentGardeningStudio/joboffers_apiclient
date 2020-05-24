@@ -7,10 +7,10 @@ def test_get_offers_not_supported():
 
 
 def test_get_offers_no_location():
-    results = get_offers("apec", auth_key="dummy", params={})
+    results = get_offers("githubjobs", params={})
     assert results == []
 
 
 def test_get_offers_not_authorized():
-    results = get_offers("apec", auth_key="dummy", params={"location": "any"})
+    results = get_offers("apec", params={"location": "any"})
     assert results == []

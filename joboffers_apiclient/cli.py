@@ -3,8 +3,6 @@ import sys
 from .__about__ import __version__
 from .main import get_offers
 
-APEC_API_URL = "https://api-beta.dashblock.com/apec_jobs/search"
-
 
 def offers(argv=None):
     # Parse command line arguments.
@@ -17,7 +15,7 @@ def offers(argv=None):
         "location": args.location,
         "paginate_max": args.paginate_max,
     }
-    items = get_offers(args.name, args.auth_key, params)
+    items = get_offers(args.name, params)
 
     if items:
         print("Extracted {} job offers in total".format(len(items)))
@@ -43,13 +41,6 @@ def _get_parser():
         "paginate_max",
         type=int,
         help="pagination max number for the offers results pages",
-    )
-    parser.add_argument(
-        "--auth-key",
-        type=str,
-        nargs="?",
-        default="",
-        help="Authentication key for the API, if needed",
     )
 
     __copyright__ = (

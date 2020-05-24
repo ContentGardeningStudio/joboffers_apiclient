@@ -7,11 +7,12 @@ SUPPORTED_APIS = {
     "apec": {
         "url": "https://api-beta.dashblock.com/apec_jobs/search",
         "method": "POST",
+        "auth_key": ""
     },
 }
 
 
-def get_offers(api_name, auth_key="", params=None):
+def get_offers(api_name, params=None):
     """ Get offers by submitting a POST request to an API we use """
 
     if api_name not in SUPPORTED_APIS:
@@ -30,13 +31,15 @@ def get_offers(api_name, auth_key="", params=None):
 
     api_url = SUPPORTED_APIS[api_name]["url"]
     api_method = SUPPORTED_APIS[api_name]["method"].lower()
+    api_auth_key = SUPPORTED_APIS[api_name].get("auth_key", "")
+
     # prepare the function we need for the HTTP calls
     func = getattr(requests, api_method)
 
     # The headers
     headers = {"Connection": "close"}
-    if auth_key:
-        headers["Authorization"] = "Basic {}".format(auth_key)
+    if api_auth_key:
+        headers["Authorization"] = "Basic {}".format(api_auth_key)
 
     # Init. the offers list
     offers = []
