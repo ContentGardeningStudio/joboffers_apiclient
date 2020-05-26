@@ -1,21 +1,35 @@
+import os
 from urllib.parse import urlencode
 
 import requests
 
-SUPPORTED_APIS = {
-    "githubjobs": {"url": "https://jobs.github.com/positions.json", "method": "GET"},
-    "apec": {
-        "url": "https://api-beta.dashblock.com/apec_jobs/search",
-        "method": "POST",
-        "auth_key": ""
-    },
-}
+
+def get_supported_api_conf(name):
+
+    conf = {}
+    if name == "githubjobs":
+        conf = {"url": "https://jobs.github.com/positions.json", "method": "GET"}
+    elif name == "apec":
+        auth_key = os.environ.get("APEC_API_KEY", "")
+        if not auth_key:
+            print(
+                "WARNING: You need to provide the API authentication key as an environment variable!"
+            )
+
+        conf = {
+            "url": "https://api-beta.dashblock.com/apec_jobs/search",
+            "method": "POST",
+            "auth_key": auth_key,
+        }
+    return conf
 
 
 def get_offers(api_name, params=None):
     """ Get offers by submitting a POST request to an API we use """
 
-    if api_name not in SUPPORTED_APIS:
+    conf = get_supported_api_conf(name=api_name)
+
+    if not conf:
         print("'{}' is not a supported API".format(api_name))
         return []
 
@@ -29,9 +43,10 @@ def get_offers(api_name, params=None):
     # prepare the request parameters
     req_params = {"location": params["location"]}
 
-    api_url = SUPPORTED_APIS[api_name]["url"]
-    api_method = SUPPORTED_APIS[api_name]["method"].lower()
-    api_auth_key = SUPPORTED_APIS[api_name].get("auth_key", "")
+    api_url = conf["url"]
+    api_method = conf["method"].lower()
+    # auth key, in case it is an API with auth
+    api_auth_key = conf.get("auth_key", "")
 
     # prepare the function we need for the HTTP calls
     func = getattr(requests, api_method)
